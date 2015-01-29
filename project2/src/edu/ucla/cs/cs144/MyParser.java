@@ -182,6 +182,20 @@ class MyParser {
         
         /* Fill in code here (you will probably need to write auxiliary
             methods). */
+    
+        //get the root of XML DOM tree
+        Element root = doc.getDocumentElement();
+        Element[] items = getElementsByTagName(root, "Item");
+
+
+        //iterate through the item list
+        for (int i=0; i<items.length; i++) {
+
+            //todo
+
+
+
+        }
         
         
         
