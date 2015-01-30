@@ -62,6 +62,113 @@ class MyParser {
 	"Notation",
     };
     
+
+    //Data structures for DB relations
+
+    //Item
+    public static Item {
+        String id;
+        String name;
+        String currently;
+        String buy_price;
+        String first_bid;
+        String location_id;
+        String started;
+        String ends;
+        String seller_id;
+        String description;
+
+        Item(String id, String name, String currently, String buy_price, String _first_bid, \
+                String location_id, String started, String ends, String seller_id, String description ) {
+            this.id = id;
+            this.name = name;
+            this.currently = currently;
+            this.buy_price = buy_price;
+            this.first_bid = first_bid;
+            this.location_id = location_id;
+            this.started = started;
+            this.ends = ends;
+            this.seller_id = seller_id;
+            this.description = description;
+        }
+    }
+
+    //ItemCategory
+    public static ItemCategory {
+        String iid;
+        String cid;
+
+        ItemCategory(String iid, String cid) {
+            this.iid = iid;
+            this.cid = cid;
+        }
+    }
+
+    //Category
+    public static Category {
+        String id;
+        String name;
+
+        Category(String id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+    }
+
+    //Bid
+    public static Bid {
+        String bid;
+        String time;
+        String amount;
+        String iid;
+
+        Bid(String bid, String time, String amount, String iid) {
+            this.bid = bid;
+            this.time = time;
+            this.amount = amount;
+            this.iid = iid;
+        }
+    }
+
+    //User
+    public static User {
+        String id;
+        String location_id;
+        String rating;
+
+        User(String id, String location_id, String rating) {
+            this.id = id;
+            this.location_id = location_id;
+            this.rating = rating; 
+        }
+    }
+
+    //Location
+    public static Location {
+        String id;
+        String location;
+        String country;
+        String lng;
+        String lat;
+
+        Location(String id, String location, String country, String lng, String lat) {
+            this.id = id;
+            this.location = location;
+            this.country = country;
+            this.lng = lng;
+            this.lat = lat;
+        }
+    }
+
+    //Vectors for data entities storage
+    ArrayList<Item> itemList = new ArrayList<Item>();
+    ArrayList<ItemCategory> itemCategoryList = new ArrayList<ItemCategory>();
+    ArrayList<Category> categoryList = new ArrayList<Category>();
+    ArrayList<Bid> bidList = new ArrayList<Bid>();
+    ArrayList<User> userList = new ArrayList<User>();
+    ArrayList<Location> locationList = new ArrayList<Location>();
+
+
     static class MyErrorHandler implements ErrorHandler {
         
         public void warning(SAXParseException exception)
@@ -187,11 +294,30 @@ class MyParser {
         Element root = doc.getDocumentElement();
         Element[] items = getElementsByTagName(root, "Item");
 
-
         //iterate through the item list
         for (int i=0; i<items.length; i++) {
 
-            //todo
+            //item tuple
+            String itemId = items[i].getAttribute("ItemID");
+            String name = getElementTextByTagNameNR(items[i],"Name");
+            
+            //category tuple
+            Element[] categories = getElementsByTagNameNR(items[i], "Category");
+            for(int j=0; j<categories.length; j++) {
+                String category = getElementText(categories[j]);
+            }
+
+            //item_category tuple
+
+
+
+            //bid tuple
+
+
+            //user tuple
+
+
+            //location tuple
 
 
 
