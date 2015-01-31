@@ -66,7 +66,7 @@ class MyParser {
     //Data structures for DB relations
 
     //Item
-    public static Item {
+    public static class Item {
         String id;
         String name;
         String currently;
@@ -78,7 +78,7 @@ class MyParser {
         String seller_id;
         String description;
 
-        Item(String id, String name, String currently, String buy_price, String _first_bid, \
+        Item(String id, String name, String currently, String buy_price, String first_bid, 
                 String location_id, String started, String ends, String seller_id, String description ) {
             this.id = id;
             this.name = name;
@@ -94,7 +94,7 @@ class MyParser {
     }
 
     //ItemCategory
-    public static ItemCategory {
+    public static class ItemCategory {
         String iid;
         String cid;
 
@@ -105,7 +105,7 @@ class MyParser {
     }
 
     //Category
-    public static Category {
+    public static class Category {
         String id;
         String name;
 
@@ -116,7 +116,7 @@ class MyParser {
     }
 
     //Bid
-    public static Bid {
+    public static class Bid {
         String bid;
         String time;
         String amount;
@@ -131,7 +131,7 @@ class MyParser {
     }
 
     //User
-    public static User {
+    public static class User {
         String id;
         String location_id;
         String rating;
@@ -144,7 +144,7 @@ class MyParser {
     }
 
     //Location
-    public static Location {
+    public static class Location {
         String id;
         String location;
         String country;
@@ -160,14 +160,20 @@ class MyParser {
         }
     }
 
-    //Vectors for data entities storage
-    ArrayList<Item> itemList = new ArrayList<Item>();
-    ArrayList<ItemCategory> itemCategoryList = new ArrayList<ItemCategory>();
-    ArrayList<Category> categoryList = new ArrayList<Category>();
-    ArrayList<Bid> bidList = new ArrayList<Bid>();
-    ArrayList<User> userList = new ArrayList<User>();
-    ArrayList<Location> locationList = new ArrayList<Location>();
+    //Vectors for tuples storage
+    public static ArrayList<Item> itemList = new ArrayList<Item>();
+    public static ArrayList<ItemCategory> itemCategoryList = new ArrayList<ItemCategory>();
+    public static ArrayList<Category> categoryList = new ArrayList<Category>();
+    public static ArrayList<Bid> bidList = new ArrayList<Bid>();
+    public static ArrayList<User> userList = new ArrayList<User>();
+    public static ArrayList<Location> locationList = new ArrayList<Location>();
 
+    //map category name to its id
+    public static HashMap<String, String> categoryMap = new HashMap<String, String>();
+    //set for storing user id
+    public static HashSet<String> uidSet = new HashSet<String>();
+    //map location name to its id
+    public static HashMap<String, String> locationMap = new HashMap<String, String>();
 
     static class MyErrorHandler implements ErrorHandler {
         
@@ -292,7 +298,11 @@ class MyParser {
     
         //get the root of XML DOM tree
         Element root = doc.getDocumentElement();
-        Element[] items = getElementsByTagName(root, "Item");
+        Element[] items = getElementsByTagNameNR(root, "Item");
+
+        //index for category ID
+        int categoryIndex = 0;
+        int locationIndex = 0;
 
         //iterate through the item list
         for (int i=0; i<items.length; i++) {
@@ -300,26 +310,127 @@ class MyParser {
             //item tuple
             String itemId = items[i].getAttribute("ItemID");
             String name = getElementTextByTagNameNR(items[i],"Name");
-            
+            String currently = strip(getElementTextByTagNameNR(items[i],"Currently"));
+            String buy_price = strip(getElementTextByTagNameNR(items[i],"Buy_Price"));
+            String first_bid = strip(getElementTextByTagNameNR(items[i],"First_Bid"));
+            //todo
+            String started = getElementTextByTagNameNR(items[i],"Started");
+            String ends = getElementTextByTagNameNR(items[i],"Ends");
+            String description = getElementTextByTagNameNR(items[i],"Description");
+            //truncate description if it has more than 4000 characters
+            if (description.length()>4000)
+                    description = description.substring(0, 4000);
+     
+
+
             //category tuple
             Element[] categories = getElementsByTagNameNR(items[i], "Category");
             for(int j=0; j<categories.length; j++) {
                 String category = getElementText(categories[j]);
+                String cid;
+                if (categoryMap.containsKey(category)) {
+                    cid = categoryMap.get(category);
+                } else {
+                    String cidString = Integer.toString(categoryIndex++);
+                    categoryMap.put(category, cidString);
+                    Category newCategory = new Category(cidString, category);
+                    categoryList.add(newCategory);
+                    cid = cidString;
+                }
+
+                //item_category tuple
+                ItemCategory newItemCategory = new ItemCategory(itemId,cid);
+                itemCategoryList.add(newItemCategory);
+
             }
 
-            //item_category tuple
-
-
-
             //bid tuple
+            int num_of_bids = Integer.parseInt(getElementTextByTagNameNR(items[i],"Number_of_Bids"));
+            Element bidsTag = getElementByTagNameNR(items[i], "Bids");
+            Element[] bids = getElementsByTagNameNR(bidsTag,"Bid");
+            
+            //iterate through bids
+            for (int j=0; j<num_of_bids; j++) {
+                //get current bid
+                Element bidder = getElementByTagNameNR(bids[j],"Bidder");
+
+                //user tuple
+                String rating = bidder.getAttribute("Rating");
+                String uid = bidder.getAttribute("UserID");
+
+                //location
+                Element location = getElementByTagNameNR(bidder,"Location");
+                String lat = location.getAttribute("Latitude");
+                String lng = location.getAttribute("Longitude");
+                String locName = getElementText(location);
+                String country = getElementTextByTagNameNR(bidder,"Country");
+                //todo
+                String time = getElementTextByTagNameNR(bids[j],"Time");
+
+                String amount = strip(getElementTextByTagNameNR(bids[j], "Amount"));
+
+                //storing data
+                //location tuple
+                String location_id;
+                if (locationMap.containsKey(locName)) {
+                    location_id = locationMap.get(locName);
+                } else {
+                    String locIDString = Integer.toString(locationIndex++);
+                    locationMap.put(locName,locIDString);
+                    Location newLocation = new Location(locIDString,locName,country,lng,lat);
+                    locationList.add(newLocation);
+                    location_id = locIDString;
+                }
+
+                //user tuple
+                String bidder_id = uid;
+                if (!uidSet.contains(uid)) {
+                    uidSet.add(uid);
+                    User newUser = new User(uid, location_id, rating);
+                    userList.add(newUser);
+                }  
+
+                //bid tuple
+                Bid newBid = new Bid(bidder_id,time,amount,itemId);
+                bidList.add(newBid);
+
+            }
+
+            //seller tuple
+            Element iLocation = getElementByTagNameNR(items[i],"Location");
+            String iLat =  iLocation.getAttribute("Latitude");
+            String iLng = iLocation.getAttribute("Longitude");
+            String iLocName = getElementText(iLocation);
+            String iCountry = getElementTextByTagNameNR(items[i],"Country");
+            
+            String iLocation_id;
+            if (locationMap.containsKey(iLocName)) {
+                iLocation_id = locationMap.get(iLocName);
+            } else {
+                String locIDString = Integer.toString(locationIndex++);
+                locationMap.put(iLocName,locIDString);
+                Location newILocation = new Location(locIDString,iLocName,iCountry,iLng,iLat);
+                locationList.add(newILocation);
+                iLocation_id = locIDString;
+            }            
+       
+            Element seller = getElementByTagNameNR(items[i],"Seller");
+            String seller_rating = seller.getAttribute("Rating");
+            String seller_id = seller.getAttribute("UserID");
+            if (!uidSet.contains(seller_id)) {
+                uidSet.add(seller_id);
+                User newUser = new User(seller_id, iLocation_id, seller_rating);
+                userList.add(newUser);
+            }   
+
+            //save item tuple
+            Item newItem = new Item(itemId, name, currently, buy_price,first_bid,iLocation_id,started,
+                                    ends,seller_id, description);  
+            itemList.add(newItem);    
 
 
-            //user tuple
-
-
-            //location tuple
-
-
+            //debug
+            //System.out.println("Complete item: "+itemId);
 
         }
         
@@ -357,5 +468,8 @@ class MyParser {
             File currentFile = new File(args[i]);
             processFile(currentFile);
         }
+
+        
+        
     }
 }
