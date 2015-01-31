@@ -28,6 +28,7 @@ package edu.ucla.cs.cs144;
 import java.io.*;
 import java.text.*;
 import java.util.*;
+import java.lang.String;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
@@ -43,23 +44,23 @@ import org.xml.sax.ErrorHandler;
 
 class MyParser {
     
-    static final String columnSeparator = "|*|";
+    static final String cs = "|*|";
     static DocumentBuilder builder;
     
     static final String[] typeName = {
-	"none",
-	"Element",
-	"Attr",
-	"Text",
-	"CDATA",
-	"EntityRef",
-	"Entity",
-	"ProcInstr",
-	"Comment",
-	"Document",
-	"DocType",
-	"DocFragment",
-	"Notation",
+    "none",
+    "Element",
+    "Attr",
+    "Text",
+    "CDATA",
+    "EntityRef",
+    "Entity",
+    "ProcInstr",
+    "Comment",
+    "Document",
+    "DocType",
+    "DocFragment",
+    "Notation",
     };
     
 
@@ -161,12 +162,12 @@ class MyParser {
     }
 
     //Vectors for tuples storage
-    public static ArrayList<Item> itemList = new ArrayList<Item>();
-    public static ArrayList<ItemCategory> itemCategoryList = new ArrayList<ItemCategory>();
-    public static ArrayList<Category> categoryList = new ArrayList<Category>();
-    public static ArrayList<Bid> bidList = new ArrayList<Bid>();
-    public static ArrayList<User> userList = new ArrayList<User>();
-    public static ArrayList<Location> locationList = new ArrayList<Location>();
+    public static HashSet<Item> itemList = new HashSet<Item>();
+    public static HashSet<ItemCategory> itemCategoryList = new HashSet<ItemCategory>();
+    public static HashSet<Category> categoryList = new HashSet<Category>();
+    public static HashSet<Bid> bidList = new HashSet<Bid>();
+    public static HashSet<User> userList = new HashSet<User>();
+    public static HashSet<Location> locationList = new HashSet<Location>();
 
     //map category name to its id
     public static HashMap<String, String> categoryMap = new HashMap<String, String>();
@@ -270,6 +271,22 @@ class MyParser {
             return nf.format(am).substring(1);
         }
     }
+
+    /* Convert date from MMM-dd-yy HH:mm:ss format to yyyy-MM-dd HH:mm:ss format
+     */
+    static String changeDateFormat(String date) {
+        String returnMe="";
+        try  {
+            DateFormat originalFormat = new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+            DateFormat newFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            Date oldDate = originalFormat.parse(date); 
+            returnMe = newFormat.format(oldDate); 
+        } catch (ParseException e) {
+            System.out.println("Print date error");
+        }   
+        return returnMe;
+    }
+
     
     /* Process one items-???.xml file.
      */
@@ -313,9 +330,8 @@ class MyParser {
             String currently = strip(getElementTextByTagNameNR(items[i],"Currently"));
             String buy_price = strip(getElementTextByTagNameNR(items[i],"Buy_Price"));
             String first_bid = strip(getElementTextByTagNameNR(items[i],"First_Bid"));
-            //todo
-            String started = getElementTextByTagNameNR(items[i],"Started");
-            String ends = getElementTextByTagNameNR(items[i],"Ends");
+            String started = changeDateFormat(getElementTextByTagNameNR(items[i],"Started"));
+            String ends = changeDateFormat(getElementTextByTagNameNR(items[i],"Ends"));
             String description = getElementTextByTagNameNR(items[i],"Description");
             //truncate description if it has more than 4000 characters
             if (description.length()>4000)
@@ -360,12 +376,20 @@ class MyParser {
 
                 //location
                 Element location = getElementByTagNameNR(bidder,"Location");
-                String lat = location.getAttribute("Latitude");
-                String lng = location.getAttribute("Longitude");
+                if (location == null) {
+                    continue;
+                }
+                String lat = "";
+                if (location.hasAttribute("Latitude")) {
+                    lat = location.getAttribute("Latitude");
+                }
+                String lng = "";
+                if (location.hasAttribute("Longitude")) {
+                    lng = location.getAttribute("Longitude");
+                }
                 String locName = getElementText(location);
                 String country = getElementTextByTagNameNR(bidder,"Country");
-                //todo
-                String time = getElementTextByTagNameNR(bids[j],"Time");
+                String time = changeDateFormat(getElementTextByTagNameNR(bids[j],"Time"));
 
                 String amount = strip(getElementTextByTagNameNR(bids[j], "Amount"));
 
@@ -398,8 +422,14 @@ class MyParser {
 
             //seller tuple
             Element iLocation = getElementByTagNameNR(items[i],"Location");
-            String iLat =  iLocation.getAttribute("Latitude");
-            String iLng = iLocation.getAttribute("Longitude");
+            String iLat = "";
+            if (iLocation.hasAttribute("Latitude")) {
+                iLat = iLocation.getAttribute("Latitude");
+            }
+            String iLng = "";
+            if (iLocation.hasAttribute("Longitude")) {
+                iLng = iLocation.getAttribute("Longitude");
+            }
             String iLocName = getElementText(iLocation);
             String iCountry = getElementTextByTagNameNR(items[i],"Country");
             
@@ -469,7 +499,125 @@ class MyParser {
             processFile(currentFile);
         }
 
-        
-        
+
+        //output dat files  
+
+        // output Location tuples
+        try {
+
+            FileWriter fw = new FileWriter("dat/Locations.dat");
+            BufferedWriter bw= new BufferedWriter(fw);
+     
+            for (Location i : locationList) {
+                String tuple= i.id + cs + i.location + cs + i.country + cs + i.lat + cs + i.lng;
+                tuple += "\n";
+                bw.write(tuple); 
+            }
+
+            bw.close();
+            fw.close();
+
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
+
+
+        // output User tuples
+        try {
+
+            FileWriter fw = new FileWriter("dat/Users.dat");
+            BufferedWriter bw= new BufferedWriter(fw);
+     
+            for (User i : userList) {
+                String tuple = i.id + cs + i.location_id + cs + i.rating;      
+                tuple += "\n";
+                bw.write(tuple); 
+            }
+
+            bw.close();
+            fw.close();
+
+        } catch (IOException e) {
+                e.printStackTrace();
+        }
+
+        // output Category tuples
+        try {
+
+            FileWriter fw = new FileWriter("dat/Categories.dat");
+            BufferedWriter bw= new BufferedWriter(fw);
+     
+            for (Category i : categoryList) {
+                String tuple = i.id + cs + i.name;
+                tuple += "\n";
+                bw.write(tuple); 
+            }
+
+            bw.close();
+            fw.close();
+
+        } catch (IOException e) {
+                e.printStackTrace();
+        }        
+
+        // output Item tuples
+        try {
+
+            FileWriter fw = new FileWriter("dat/Items.dat");
+            BufferedWriter bw= new BufferedWriter(fw);
+     
+            for (Item i : itemList) {
+                String tuple = i.id + cs + i.name + cs + i.currently + cs + i.buy_price + cs + i.location_id +
+                        cs + i.started + cs + i.ends + cs + i.seller_id + cs + i.description;
+                tuple += "\n";
+                bw.write(tuple); 
+            }
+
+            bw.close();
+            fw.close();
+
+        } catch (IOException e) {
+                e.printStackTrace();
+        }    
+
+        // output ItemCategory tuples
+        try {
+
+            FileWriter fw = new FileWriter("dat/ItemCategories.dat");
+            BufferedWriter bw= new BufferedWriter(fw);
+     
+            for (ItemCategory i : itemCategoryList) {
+                String tuple = i.iid + cs + i.cid;
+                tuple += "\n";
+                bw.write(tuple); 
+            }
+
+            bw.close();
+            fw.close();
+
+        } catch (IOException e) {
+                e.printStackTrace();
+        }    
+
+        // output Bid tuples
+        try {
+
+            FileWriter fw = new FileWriter("dat/Bids.dat");
+            BufferedWriter bw= new BufferedWriter(fw);
+     
+            for (Bid i : bidList) {
+                String tuple = i.bid + cs + i.time + cs + i.amount + cs + i.iid;
+                tuple += "\n";
+                bw.write(tuple); 
+            }
+
+            bw.close();
+            fw.close();
+
+        } catch (IOException e) {
+                e.printStackTrace();
+        }    
+
+
     }
 }
