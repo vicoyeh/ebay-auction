@@ -381,18 +381,21 @@ class MyParser {
 
                 //location
                 Element location = getElementByTagNameNR(bidder,"Location");
-                if (location == null) {
-                    continue;
-                }
+                
                 String lat = "\\N";
-                if (location.hasAttribute("Latitude")) {
-                    lat = location.getAttribute("Latitude");
-                }
                 String lng = "\\N";
-                if (location.hasAttribute("Longitude")) {
-                    lng = location.getAttribute("Longitude");
+                String locName = "\\N";  
+                if (location != null) {
+                    if (location.hasAttribute("Latitude")) {
+                        lat = location.getAttribute("Latitude");
+                    }
+                    
+                    if (location.hasAttribute("Longitude")) {
+                        lng = location.getAttribute("Longitude");
+                    }
+                    locName = getElementText(location);                  
                 }
-                String locName = getElementText(location);
+               
                 String country = getElementTextByTagNameNR(bidder,"Country");
                 String time = changeDateFormat(getElementTextByTagNameNR(bids[j],"Time"));
 
