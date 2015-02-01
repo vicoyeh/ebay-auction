@@ -362,7 +362,7 @@ class MyParser {
 
                 //item_category tuple
                 ItemCategory newItemCategory = new ItemCategory(itemId,cid);
-                itemCategoryMap.put(itemId,newItemCategory);
+                itemCategoryMap.put(itemId+cid,newItemCategory);
 
             }
 
