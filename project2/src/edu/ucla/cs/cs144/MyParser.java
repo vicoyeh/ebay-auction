@@ -169,7 +169,7 @@ class MyParser {
     public static HashSet<Category> categoryList = new HashSet<Category>();
     public static HashSet<Bid> bidList = new HashSet<Bid>();
     public static Collection<User> userList;
-    public static HashSet<Location> locationList = new HashSet<Location>();
+    public static ArrayList<Location> locationList = new ArrayList<Location>();
 
     //map category name to its id
     public static HashMap<String, String> categoryMap = new HashMap<String, String>();
