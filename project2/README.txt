@@ -30,7 +30,7 @@ Relations:
 	foreign key: item_id
 	foreign key: bidder_id
 
-* Users(id, location_id, rating)
+* Users(id, location_id, bidder_rating, seller_rating)
 	primary key: id
 	foreign key: location_id 
 
