@@ -163,20 +163,14 @@ class MyParser {
         }
     }
 
-    //Vectors for tuples storage
-    public static HashSet<Item> itemList = new HashSet<Item>();
-    public static HashSet<ItemCategory> itemCategoryList = new HashSet<ItemCategory>();
-    public static HashSet<Category> categoryList = new HashSet<Category>();
-    public static HashSet<Bid> bidList = new HashSet<Bid>();
-    public static Collection<User> userList;
-    public static ArrayList<Location> locationList = new ArrayList<Location>();
+    //Maps for tuples storage
+    public static HashMap<String,User> userMap = new HashMap<String,User>();
+    public static HashMap<String,Location> locationMap = new HashMap<String,Location>();
+    public static HashMap<String,Item> itemMap = new HashMap<String,Item>();
+    public static HashMap<String,ItemCategory> itemCategoryMap = new HashMap<String,ItemCategory>();
+    public static HashMap<String,Category> categoryMap = new HashMap<String,Category>();
+    public static HashMap<String,Bid> bidMap = new HashMap<String,Bid>();
 
-    //map category name to its id
-    public static HashMap<String, String> categoryMap = new HashMap<String, String>();
-    //map for storing user id to user object
-    public static HashMap<String, User> userMap = new HashMap<String, User>();
-    //map location name to its id
-    public static HashMap<String, String> locationMap = new HashMap<String, String>();
 
     static class MyErrorHandler implements ErrorHandler {
         
@@ -274,6 +268,13 @@ class MyParser {
         }
     }
 
+    /* Hash the string
+     */
+    static int hash(String str) {
+        return str.charAt(str.length()-2)*100000+str.charAt(str.length()-1)*10000;
+    }
+
+
     /* Convert date from MMM-dd-yy HH:mm:ss format to yyyy-MM-dd HH:mm:ss format
      */
     static String changeDateFormat(String date) {
@@ -320,8 +321,8 @@ class MyParser {
         Element[] items = getElementsByTagNameNR(root, "Item");
 
         //index for category ID
-        int categoryIndex = 0;
-        int locationIndex = 0;
+        int categoryIndex ;
+        int locationIndex ;
 
         //iterate through the item list
         for (int i=0; i<items.length; i++) {
@@ -350,18 +351,18 @@ class MyParser {
                 String category = getElementText(categories[j]);
                 String cid;
                 if (categoryMap.containsKey(category)) {
-                    cid = categoryMap.get(category);
+                    cid = categoryMap.get(category).id;
                 } else {
-                    String cidString = Integer.toString(categoryIndex++);
-                    categoryMap.put(category, cidString);
+                    categoryIndex=hash(category);
+                    String cidString = Integer.toString(categoryIndex);
                     Category newCategory = new Category(cidString, category);
-                    categoryList.add(newCategory);
+                    categoryMap.put(category, newCategory);
                     cid = cidString;
                 }
 
                 //item_category tuple
                 ItemCategory newItemCategory = new ItemCategory(itemId,cid);
-                itemCategoryList.add(newItemCategory);
+                itemCategoryMap.put(itemId,newItemCategory);
 
             }
 
@@ -405,12 +406,12 @@ class MyParser {
                 //location tuple
                 String location_id;
                 if (locationMap.containsKey(locName)) {
-                    location_id = locationMap.get(locName);
+                    location_id = locationMap.get(locName).id;
                 } else {
-                    String locIDString = Integer.toString(locationIndex++);
-                    locationMap.put(locName,locIDString);
+                    locationIndex = hash(locName);
+                    String locIDString = Integer.toString(locationIndex);
                     Location newLocation = new Location(locIDString,locName,country,lng,lat);
-                    locationList.add(newLocation);
+                    locationMap.put(locName,newLocation);
                     location_id = locIDString;
                 }
 
@@ -426,7 +427,8 @@ class MyParser {
 
                 //bid tuple
                 Bid newBid = new Bid(bidder_id,time,amount,itemId);
-                bidList.add(newBid);
+                bidMap.put(bidder_id+time+itemId,newBid);
+                
 
             }
 
@@ -443,14 +445,18 @@ class MyParser {
             String iLocName = getElementText(iLocation);
             String iCountry = getElementTextByTagNameNR(items[i],"Country");
             
+            
+
             String iLocation_id;
             if (locationMap.containsKey(iLocName)) {
-                iLocation_id = locationMap.get(iLocName);
+                
+                iLocation_id = locationMap.get(iLocName).id;
+
             } else {
-                String locIDString = Integer.toString(locationIndex++);
-                locationMap.put(iLocName,locIDString);
+                locationIndex = hash(iLocName);
+                String locIDString = Integer.toString(locationIndex);
                 Location newILocation = new Location(locIDString,iLocName,iCountry,iLng,iLat);
-                locationList.add(newILocation);
+                locationMap.put(iLocName,newILocation);
                 iLocation_id = locIDString;
             }            
        
@@ -460,7 +466,7 @@ class MyParser {
             User existingUser = userMap.get(seller_id);
             if (existingUser == null) {
                 User newUser = new User(seller_id, iLocation_id, "\\N", seller_rating);
-		userMap.put(seller_id, newUser);
+                userMap.put(seller_id, newUser);
             } else {
                 existingUser.seller_rating = seller_rating; 
             } 
@@ -468,16 +474,13 @@ class MyParser {
             //save item tuple
             Item newItem = new Item(itemId, name, currently, buy_price,first_bid,iLocation_id,started,
                                     ends,seller_id, description);  
-            itemList.add(newItem);    
-
-
-            //debug
-            //System.out.println("Complete item: "+itemId);
+            itemMap.put(itemId,newItem);      
+            
 
         }
         
-        
-        
+        //debug
+        //System.out.println("Complete item!!!!!!!!");
         /**************************************************************/
         
     }
@@ -520,7 +523,8 @@ class MyParser {
             FileWriter fw = new FileWriter("dat/Locations.dat");
             BufferedWriter bw= new BufferedWriter(fw);
      
-            for (Location i : locationList) {
+            for (Location i : locationMap.values()) {
+
                 String tuple= i.id + cs + i.location + cs + i.country + cs + i.lat + cs + i.lng;
                 tuple += "\n";
                 bw.write(tuple); 
@@ -539,8 +543,8 @@ class MyParser {
 
             FileWriter fw = new FileWriter("dat/Users.dat");
             BufferedWriter bw= new BufferedWriter(fw);
-            userList = userMap.values();
-            for (User i : userList) {
+            
+            for (User i : userMap.values()) {
                 String tuple = i.id + cs + i.location_id + cs + i.bidder_rating + cs + i.seller_rating;      
                 tuple += "\n";
                 bw.write(tuple); 
@@ -559,7 +563,7 @@ class MyParser {
             FileWriter fw = new FileWriter("dat/Categories.dat");
             BufferedWriter bw= new BufferedWriter(fw);
      
-            for (Category i : categoryList) {
+            for (Category i : categoryMap.values()) {
                 String tuple = i.id + cs + i.name;
                 tuple += "\n";
                 bw.write(tuple); 
@@ -578,7 +582,7 @@ class MyParser {
             FileWriter fw = new FileWriter("dat/Items.dat");
             BufferedWriter bw= new BufferedWriter(fw);
      
-            for (Item i : itemList) {
+            for (Item i : itemMap.values()) {
                 String tuple = i.id + cs + i.name + cs + i.currently + cs + i.buy_price + cs + i.first_bid + cs + i.location_id +
                         cs + i.started + cs + i.ends + cs + i.seller_id + cs + i.description;
                 tuple += "\n";
@@ -598,7 +602,7 @@ class MyParser {
             FileWriter fw = new FileWriter("dat/ItemCategories.dat");
             BufferedWriter bw= new BufferedWriter(fw);
      
-            for (ItemCategory i : itemCategoryList) {
+            for (ItemCategory i : itemCategoryMap.values()) {
                 String tuple = i.iid + cs + i.cid;
                 tuple += "\n";
                 bw.write(tuple); 
@@ -617,7 +621,7 @@ class MyParser {
             FileWriter fw = new FileWriter("dat/Bids.dat");
             BufferedWriter bw= new BufferedWriter(fw);
      
-            for (Bid i : bidList) {
+            for (Bid i : bidMap.values()) {
                 String tuple = i.bid + cs + i.time + cs + i.amount + cs + i.iid;
                 tuple += "\n";
                 bw.write(tuple); 
