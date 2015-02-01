@@ -6,7 +6,6 @@
     <property name="lib-dir" location="lib" />
     <property name="dat-dir" location="dat" />
     <property environment="env" />
-    <property name="env.EBAY_DATA" location="ebay-data" />
     <path id="classpath">
         <fileset dir="${lib-dir}" includes="**/*.jar"/>
         <pathelement location="${obj-dir}"/>
