@@ -7,7 +7,7 @@ CREATE TABLE Location (
 	PRIMARY KEY (id)
 );
 CREATE TABLE Users (
-	id INT,
+	id varchar(255),
 	location_id INT,
 	bidder_rating INT,
 	seller_rating INT,
@@ -30,7 +30,7 @@ CREATE TABLE Items (
 	location_id INT,
 	started TIMESTAMP,
 	ends TIMESTAMP,
-	seller_id INT,
+	seller_id varchar(255),
 	description VARCHAR(4000),
 	PRIMARY KEY (id),
 	FOREIGN KEY (seller_id) REFERENCES Users (id)
@@ -52,7 +52,7 @@ CREATE TABLE Items_Categories (
 	ON UPDATE CASCADE
 );
 CREATE TABLE Bids (
-	bidder_id INT,
+	bidder_id varchar(255),
 	time TIMESTAMP,
 	amount DECIMAL(8,2),
 	item_id INT,

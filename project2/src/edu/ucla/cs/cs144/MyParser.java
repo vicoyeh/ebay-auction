@@ -135,12 +135,14 @@ class MyParser {
     public static class User {
         String id;
         String location_id;
-        String rating;
+        String bidder_rating;
+        String seller_rating;
 
-        User(String id, String location_id, String rating) {
+        User(String id, String location_id, String bidder_rating, String seller_rating) {
             this.id = id;
             this.location_id = location_id;
-            this.rating = rating; 
+            this.bidder_rating = bidder_rating; 
+            this.seller_rating = seller_rating; 
         }
     }
 
@@ -166,13 +168,13 @@ class MyParser {
     public static HashSet<ItemCategory> itemCategoryList = new HashSet<ItemCategory>();
     public static HashSet<Category> categoryList = new HashSet<Category>();
     public static HashSet<Bid> bidList = new HashSet<Bid>();
-    public static HashSet<User> userList = new HashSet<User>();
+    public static Collection<User> userList;
     public static HashSet<Location> locationList = new HashSet<Location>();
 
     //map category name to its id
     public static HashMap<String, String> categoryMap = new HashMap<String, String>();
-    //set for storing user id
-    public static HashSet<String> uidSet = new HashSet<String>();
+    //map for storing user id to user object
+    public static HashMap<String, User> userMap = new HashMap<String, User>();
     //map location name to its id
     public static HashMap<String, String> locationMap = new HashMap<String, String>();
 
@@ -329,6 +331,9 @@ class MyParser {
             String name = getElementTextByTagNameNR(items[i],"Name");
             String currently = strip(getElementTextByTagNameNR(items[i],"Currently"));
             String buy_price = strip(getElementTextByTagNameNR(items[i],"Buy_Price"));
+            if (buy_price == "") {
+                buy_price = "\\N";
+            }
             String first_bid = strip(getElementTextByTagNameNR(items[i],"First_Bid"));
             String started = changeDateFormat(getElementTextByTagNameNR(items[i],"Started"));
             String ends = changeDateFormat(getElementTextByTagNameNR(items[i],"Ends"));
@@ -379,11 +384,11 @@ class MyParser {
                 if (location == null) {
                     continue;
                 }
-                String lat = "";
+                String lat = "\\N";
                 if (location.hasAttribute("Latitude")) {
                     lat = location.getAttribute("Latitude");
                 }
-                String lng = "";
+                String lng = "\\N";
                 if (location.hasAttribute("Longitude")) {
                     lng = location.getAttribute("Longitude");
                 }
@@ -408,11 +413,13 @@ class MyParser {
 
                 //user tuple
                 String bidder_id = uid;
-                if (!uidSet.contains(uid)) {
-                    uidSet.add(uid);
-                    User newUser = new User(uid, location_id, rating);
-                    userList.add(newUser);
-                }  
+                User existingUser = userMap.get(uid);
+                if (existingUser == null) {
+                    User newUser = new User(uid, location_id, rating, "\\N");
+                    userMap.put(uid,newUser);
+                } else {
+                    existingUser.bidder_rating = rating;
+                } 
 
                 //bid tuple
                 Bid newBid = new Bid(bidder_id,time,amount,itemId);
@@ -422,11 +429,11 @@ class MyParser {
 
             //seller tuple
             Element iLocation = getElementByTagNameNR(items[i],"Location");
-            String iLat = "";
+            String iLat = "\\N";
             if (iLocation.hasAttribute("Latitude")) {
                 iLat = iLocation.getAttribute("Latitude");
             }
-            String iLng = "";
+            String iLng = "\\N";
             if (iLocation.hasAttribute("Longitude")) {
                 iLng = iLocation.getAttribute("Longitude");
             }
@@ -447,11 +454,13 @@ class MyParser {
             Element seller = getElementByTagNameNR(items[i],"Seller");
             String seller_rating = seller.getAttribute("Rating");
             String seller_id = seller.getAttribute("UserID");
-            if (!uidSet.contains(seller_id)) {
-                uidSet.add(seller_id);
-                User newUser = new User(seller_id, iLocation_id, seller_rating);
-                userList.add(newUser);
-            }   
+            User existingUser = userMap.get(seller_id);
+            if (existingUser == null) {
+                User newUser = new User(seller_id, iLocation_id, "\\N", seller_rating);
+		userMap.put(seller_id, newUser);
+            } else {
+                existingUser.seller_rating = seller_rating; 
+            } 
 
             //save item tuple
             Item newItem = new Item(itemId, name, currently, buy_price,first_bid,iLocation_id,started,
@@ -527,9 +536,9 @@ class MyParser {
 
             FileWriter fw = new FileWriter("dat/Users.dat");
             BufferedWriter bw= new BufferedWriter(fw);
-     
+            userList = userMap.values();
             for (User i : userList) {
-                String tuple = i.id + cs + i.location_id + cs + i.rating;      
+                String tuple = i.id + cs + i.location_id + cs + i.bidder_rating + cs + i.seller_rating;      
                 tuple += "\n";
                 bw.write(tuple); 
             }
@@ -567,7 +576,7 @@ class MyParser {
             BufferedWriter bw= new BufferedWriter(fw);
      
             for (Item i : itemList) {
-                String tuple = i.id + cs + i.name + cs + i.currently + cs + i.buy_price + cs + i.location_id +
+                String tuple = i.id + cs + i.name + cs + i.currently + cs + i.buy_price + cs + i.first_bid + cs + i.location_id +
                         cs + i.started + cs + i.ends + cs + i.seller_id + cs + i.description;
                 tuple += "\n";
                 bw.write(tuple); 
