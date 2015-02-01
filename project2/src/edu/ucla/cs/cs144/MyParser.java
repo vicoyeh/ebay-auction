@@ -271,7 +271,7 @@ class MyParser {
     /* Hash the string
      */
     static int hash(String str) {
-        return str.charAt(str.length()-2)*100000+str.charAt(str.length()-1)*10000;
+        return str.hashCode();
     }
 
 
@@ -321,8 +321,8 @@ class MyParser {
         Element[] items = getElementsByTagNameNR(root, "Item");
 
         //index for category ID
-        int categoryIndex ;
-        int locationIndex ;
+        int categoryIndex;
+        int locationIndex;
 
         //iterate through the item list
         for (int i=0; i<items.length; i++) {
