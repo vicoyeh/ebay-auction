@@ -54,9 +54,8 @@ public class Indexer {
         IndexWriter writer = getIndexWriter(false);
         Document doc = new Document();
         doc.add(new StringField("iid", item.iid, Field.Store.YES));
-        doc.add(new StringField("cid", item.cid, Field.Store.YES));
         doc.add(new StringField("name", item.name, Field.Store.YES));
-        String fullText = item.iid + " " + item.cid + " " + item.name + " " + item.category + " " + item.description; 
+        String fullText = item.iid + " " + item.name + " " + item.category + " " + item.description; 
         doc.add(new TextField("content", fullText, Field.Store.NO));
         writer.addDocument(doc);
     }   
