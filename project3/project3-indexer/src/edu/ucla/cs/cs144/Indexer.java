@@ -36,7 +36,7 @@ public class Indexer {
 
     public IndexWriter getIndexWriter(boolean create) throws IOException {
         if (indexWriter == null) {
-            Directory indexDir = FSDirectory.open(new File("/var/lib/lucene/"));
+            Directory indexDir = FSDirectory.open(new File("/var/lib/lucene/index1"));
             IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_4_10_2, new StandardAnalyzer());
             indexWriter = new IndexWriter(indexDir, config);
         }
@@ -50,7 +50,6 @@ public class Indexer {
     }
 
     public void indexItem(Item item) throws IOException {
-        System.out.println("Indexing item: " + item);
         IndexWriter writer = getIndexWriter(false);
         Document doc = new Document();
         doc.add(new StringField("iid", item.iid, Field.Store.YES));
@@ -72,36 +71,46 @@ public class Indexer {
 	    System.out.println(ex);
 	}
 
-    getIndexWriter(true);
 
-	//retrieve data
-    //todo
-    PreparedStatement prepareRetrieveItems = con.PrepareStatement(
-        "SELECT Items.id, Categories.id, Items.name, Categories.name, Items.description
-         FROM Items, Categories, Items_Categories WHERE Items_Categories.item_id = Items.id 
-        AND Categories.id = Items_Categories.category_id;"
-    );
+    try {
+        getIndexWriter(true);
 
-    String iid, cid name, category, description;
-    ArrayList<Item> itemList = new ArrayList<Item>();
-    ResultSet rs = prepareRetrieveItems.executeQuery();
-    while (rs.next()) {
-        iid = rs.getString("iid");
-        cid = rs.getString("cid");
-        name = rs.getString("name");
-        category = rs.getString("category");
-        description = rs.getString("description");
-        Item item = new Item(iid,cid,name,category,description);
-        itemList.add(item);
+    	//retrieve data
+        //todo
+        PreparedStatement prepareRetrieveItems = conn.prepareStatement(
+            "select Items.id as item_id, Items.name as item_name, description, Categories.categories as" +
+            " categories from Items inner join (select item_id, group_concat(name SEPARATOR ' ') "+
+                "as categories from Items_Categories inner join Categories on category_id = "+
+                "Categories.id group by item_id) as Categories on Items.id = Categories.item_id"
+        );
+
+        int iid;
+        String id, name, category, description;
+        ArrayList<Item> itemList = new ArrayList<Item>();
+        ResultSet rs = prepareRetrieveItems.executeQuery();
+        while (rs.next()) {
+            iid = rs.getInt(1);
+            id = Integer.toString(iid);
+            name = rs.getString(2);
+            description = rs.getString(3);
+            category = rs.getString(4);
+            Item item = new Item(id,name,category,description);
+            itemList.add(item);
+        }
+
+        //build index
+        for (Item item: itemList) {
+            indexItem(item);
+        }
+
+
+        closeIndexWriter();
+
+    } catch (SQLException ex) {
+        System.out.println(ex);
+    } catch (IOException ex) {
+        System.out.println(ex);
     }
-
-    //build index
-    for (Item item: itemList) {
-        indexItem(item);
-    }
-
-
-    closeIndexWriter();
 
         // close the database connection
 	try {
