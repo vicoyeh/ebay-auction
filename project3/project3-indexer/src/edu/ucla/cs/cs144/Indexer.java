@@ -53,9 +53,11 @@ public class Indexer {
         System.out.println("Indexing item: " + item);
         IndexWriter writer = getIndexWriter(false);
         Document doc = new Document();
+        doc.add(new StringField("iid", item.iid, Field.Store.YES));
+        doc.add(new StringField("cid", item.cid, Field.Store.YES));
         doc.add(new StringField("name", item.name, Field.Store.YES));
-        doc.add(new StringField("category", item.category, Field.Store.YES));
-        doc.add(new TextField("description", item.description, Field.Store.NO));
+        String fullText = item.iid + " " + item.cid + " " + item.name + " " + item.category + " " + item.description; 
+        doc.add(new TextField("content", fullText, Field.Store.NO));
         writer.addDocument(doc);
     }   
 
@@ -71,21 +73,26 @@ public class Indexer {
 	    System.out.println(ex);
 	}
 
+    getIndexWriter(true);
 
 	//retrieve data
     //todo
     PreparedStatement prepareRetrieveItems = con.PrepareStatement(
-        "SELECT Items.name, Items.description FROM Items INNER JOIN Categories"
+        "SELECT Items.id, Categories.id, Items.name, Categories.name, Items.description
+         FROM Items, Categories, Items_Categories WHERE Items_Categories.item_id = Items.id 
+        AND Categories.id = Items_Categories.category_id;"
     );
 
-    String name, category, description;
+    String iid, cid name, category, description;
     ArrayList<Item> itemList = new ArrayList<Item>();
     ResultSet rs = prepareRetrieveItems.executeQuery();
     while (rs.next()) {
+        iid = rs.getString("iid");
+        cid = rs.getString("cid");
         name = rs.getString("name");
         category = rs.getString("category");
         description = rs.getString("description");
-        Item item = new Item(name,category,description);
+        Item item = new Item(iid,cid,name,category,description);
         itemList.add(item);
     }
 
