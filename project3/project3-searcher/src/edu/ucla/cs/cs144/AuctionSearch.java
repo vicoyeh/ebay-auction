@@ -11,6 +11,7 @@ import java.text.SimpleDateFormat;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -111,13 +112,98 @@ public class AuctionSearch implements IAuctionSearch {
 
 	public SearchResult[] spatialSearch(String query, SearchRegion region,
 			int numResultsToSkip, int numResultsToReturn) {
-		// TODO: Your code here!
-		return new SearchResult[0];
+		
+  		SearchResult[] returnList = null;
+
+  		Connection conn = null;
+		try {
+		    conn = DbManager.getConnection(true);
+		} catch (SQLException ex) {
+		    System.out.println(ex);
+		}
+
+		try {
+	  		String geoParam = "'Polygon(("+region.getLx()+" "+region.getLy()+
+	  									","+region.getRx()+" "+region.getLy()+
+	  									","+region.getRx()+" "+region.getRy()+
+	  									","+region.getLx()+" "+region.getRy()+
+	  									","+region.getLx()+" "+region.getLy()+"))'";
+	        
+	        PreparedStatement prepareRetrieveLoc = conn.prepareStatement(
+	            "SELECT itemId FROM LocIndex WHERE " +
+	    			"MBRContains(GeomFromText("+geoParam+"),location);"
+	        );
+
+	        ResultSet rs = prepareRetrieveLoc.executeQuery();
+	       	int iid;
+	       	String id,category;
+	       	
+	       	ArrayList<String> idList = new ArrayList<String>();
+	        while (rs.next()) {
+	        	iid = rs.getInt(1);
+	        	id = Integer.toString(iid);
+	        	idList.add(id);
+	        }
+	        SearchResult[] resultList = basicSearch(query, 0, idList.size());
+	        ArrayList<SearchResult> resultArray = new ArrayList<SearchResult>();
+
+	        for (int i=0;i<resultList.length;i++) {
+	        	if (idList.contains(resultList[i].getItemId())) {
+	        		resultArray.add(resultList[i]);
+	        	}
+	        }
+
+	        //find matched elements
+	        returnList = new SearchResult[resultArray.size()];
+	        for (int i=0;i<resultArray.size();i++) {
+	        	returnList[i] = resultArray.get(i);
+	        }
+			
+		} catch (SQLException ex) {
+	        System.out.println(ex);
+	    } 
+        
+        // close the database connection
+		try {
+			conn.close();
+		} catch (SQLException ex) {
+			System.out.println(ex);
+		}	
+
+		return returnList;
 	}
 
 	public String getXMLDataForItemId(String itemId) {
-		// TODO: Your code here!
-		return "";
+		String xml="";
+
+  		Connection conn = null;
+  		//open database connection
+		try {
+		    conn = DbManager.getConnection(true);
+		} catch (SQLException ex) {
+		    System.out.println(ex);
+		}
+
+		try {
+			Statement retrieveQuery = conn.createStatement();
+
+			//todo
+
+
+
+
+		} catch (SQLException ex) {
+	        System.out.println(ex);
+	    } 
+        
+        // close database connection
+		try {
+			conn.close();
+		} catch (SQLException ex) {
+			System.out.println(ex);
+		}		
+
+		return xml;
 	}
 	
 	public String echo(String message) {
