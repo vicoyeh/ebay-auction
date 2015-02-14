@@ -301,7 +301,7 @@ public class AuctionSearch implements IAuctionSearch {
 
                 // country
                 Element country = doc.createElement("Country");
-                country.appendChild(doc.createTextNode((replacespecial(rs.getString("country")))));
+                country.appendChild(doc.createTextNode((escapeSpecial(rs.getString("country")))));
                 root.appendChild(country);
 
                 // started
@@ -311,7 +311,7 @@ public class AuctionSearch implements IAuctionSearch {
 
                 // ends
                 Element ends = doc.createElement("Ends");
-                ends.appendChild(doc.createTextNode(convertDate(result.getString("ends"), "yyyy-MM-dd HH:mm:ss", "MMM-dd-yy HH:mm:ss")));
+                ends.appendChild(doc.createTextNode(convertDate(rs.getString("ends"), "yyyy-MM-dd HH:mm:ss", "MMM-dd-yy HH:mm:ss")));
                 root.appendChild(ends);
 
                 // seller
@@ -322,7 +322,7 @@ public class AuctionSearch implements IAuctionSearch {
 
                 // description
                 Element description = doc.createElement("Description");
-                description.appendChild(doc.createTextNode(replacespecial(rs.getString("description"))));
+                description.appendChild(doc.createTextNode(escapeSpecial(rs.getString("description"))));
                 root.appendChild(description);
 
                 doc.appendChild(root);
@@ -359,5 +359,27 @@ public class AuctionSearch implements IAuctionSearch {
 	public String echo(String message) {
 		return message;
 	}
+
+    private String escapeSpecial(String unescapedString) {
+        return unescapedString.replaceAll("\"", "&quot;")
+            .replaceAll("\'", "&apos;")
+            .replaceAll("&", "&amp;")
+            .replaceAll("<", "&lt;")
+            .replaceAll(">", "&lt;");
+    }
+
+    private String convertDate(String date, String original_format, String converted_format) {
+        SimpleDateFormat sdf = new SimpleDateFormat(original_format);
+        String formatted_date = "";
+        try {
+            Date d = sdf.parse(date);
+            sdf.applyPattern(converted_format);
+            out = sdf.format(d);
+        } catch (Exception e) {
+            System.out.println("Error formatting date");
+        }
+
+        return formatted_date;
+    }
 
 }
