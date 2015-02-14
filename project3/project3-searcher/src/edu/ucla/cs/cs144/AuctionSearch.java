@@ -360,8 +360,6 @@ public class AuctionSearch implements IAuctionSearch {
 	        System.out.println(ex);
 	    } catch (ParserConfigurationException ex) {
 	        System.out.println(ex);
-	    } catch (TransformerConfigurationException ex) {
-	        System.out.println(ex);
 	    } catch (TransformerException ex) {
 	        System.out.println(ex);
         }
