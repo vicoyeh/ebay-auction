@@ -226,13 +226,13 @@ public class AuctionSearch implements IAuctionSearch {
 
                 // categories
                 PreparedStatement retrieveCategories = conn.prepareStatement(
-                    "SELECT category FROM Categories INNER JOIN Items_Categories ON id = category_id WHERE item_id = ?"
+                    "SELECT name FROM Categories INNER JOIN Items_Categories ON id = category_id WHERE item_id = ?"
                 );
                 retrieveCategories.setString(1, itemId);
                 ResultSet categoriesRs = retrieveCategories.executeQuery();
                 while (categoriesRs.next()) {
                     Element category = doc.createElement("Category");
-                    category.appendChild(doc.createTextNode(escapeSpecial(categoriesRs.getString("category"))));
+                    category.appendChild(doc.createTextNode(escapeSpecial(categoriesRs.getString("name"))));
                     root.appendChild(category);
                 }
                 categoriesRs.close();
