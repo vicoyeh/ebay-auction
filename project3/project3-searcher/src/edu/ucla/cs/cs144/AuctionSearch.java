@@ -45,6 +45,9 @@ import edu.ucla.cs.cs144.DbManager;
 import edu.ucla.cs.cs144.SearchRegion;
 import edu.ucla.cs.cs144.SearchResult;
 
+import org.w3c.dom.Attr;
+import org.w3c.dom.Element;
+
 public class AuctionSearch implements IAuctionSearch {
 
 	/* 
