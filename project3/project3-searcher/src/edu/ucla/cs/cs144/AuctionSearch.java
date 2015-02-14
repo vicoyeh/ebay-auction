@@ -350,6 +350,7 @@ public class AuctionSearch implements IAuctionSearch {
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                 transformer.transform(source, result);
                 xml = writer.toString();
+                xml = xml.finalEscape();
             }
 
             // Write the XML
@@ -384,6 +385,10 @@ public class AuctionSearch implements IAuctionSearch {
             .replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&lt;");
+    }
+
+    private String finalEscape(String unescapedString) {
+        return unescapedString.replaceAll("&amp;","&");
     }
 
     private String convertDate(String date, String original_format, String converted_format) {
