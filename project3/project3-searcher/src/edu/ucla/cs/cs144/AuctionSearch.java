@@ -136,7 +136,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 	        ResultSet rs = prepareRetrieveLoc.executeQuery();
 	       	int iid;
-	       	String id,category;
+	       	String id;
 	       	
 	       	ArrayList<String> idList = new ArrayList<String>();
 	        while (rs.next()) {
@@ -144,20 +144,28 @@ public class AuctionSearch implements IAuctionSearch {
 	        	id = Integer.toString(iid);
 	        	idList.add(id);
 	        }
-	        SearchResult[] resultList = basicSearch(query, 0, idList.size());
-	        ArrayList<SearchResult> resultArray = new ArrayList<SearchResult>();
 
+	        //last parameter is arbitrary for the number of items returned by basic search
+	        SearchResult[] resultList = basicSearch(query, 0, 5000);
+	        ArrayList<SearchResult> resultArray = new ArrayList<SearchResult>();
 	        for (int i=0;i<resultList.length;i++) {
 	        	if (idList.contains(resultList[i].getItemId())) {
 	        		resultArray.add(resultList[i]);
 	        	}
 	        }
 
-	        //find matched elements
-	        returnList = new SearchResult[resultArray.size()];
-	        for (int i=0;i<resultArray.size();i++) {
-	        	returnList[i] = resultArray.get(i);
+	        //filter numResultsToSkip+Return
+	        ArrayList<SearchResult> filterList = new ArrayList<SearchResult>();
+	        int count=0;
+	        for (int i=numResultsToSkip;i<resultArray.size();i++, count++) {
+	        	if (count==numResultsToReturn) {
+	        		break;
+	        	}
+	        	filterList.add(resultArray.get(i));
 	        }
+
+	        //convert to array
+	        returnList = filterList.toArray(new SearchResult[filterList.size()]);
 			
 		} catch (SQLException ex) {
 	        System.out.println(ex);

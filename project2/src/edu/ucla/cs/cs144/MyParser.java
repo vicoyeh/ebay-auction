@@ -405,7 +405,7 @@ class MyParser {
                 //storing data
                 //location tuple
                 String location_id;
-                if (locationMap.containsKey(locName)) {
+                if (locationMap.containsKey(locName) && locationMap.get(locName).lng.equals(lng)) {
                     location_id = locationMap.get(locName).id;
                 } else {
                     locationIndex = hash(locName);
@@ -448,10 +448,8 @@ class MyParser {
             
 
             String iLocation_id;
-            if (locationMap.containsKey(iLocName)) {
-                
+            if (locationMap.containsKey(iLocName) && locationMap.get(iLocName).lng.equals(iLng)) {
                 iLocation_id = locationMap.get(iLocName).id;
-
             } else {
                 locationIndex = hash(iLocName);
                 String locIDString = Integer.toString(locationIndex);
