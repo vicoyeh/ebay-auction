@@ -208,7 +208,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 		try {
 	        PreparedStatement retrieveItem = conn.prepareStatement(
-	            "SELECT * FROM Items INNER JOIN Users ON seller_id = Users.id INNER JOIN Location ON location_id = Location.id WHERE Items.id = ?"
+	            "SELECT * FROM Items INNER JOIN Users ON seller_id = Users.id INNER JOIN Location ON Items.location_id = Location.id WHERE Items.id = ?"
 	        );
             retrieveItem.setString(1, itemId);
             ResultSet rs = retrieveItem.executeQuery();
