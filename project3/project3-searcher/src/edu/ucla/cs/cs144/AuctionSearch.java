@@ -344,11 +344,11 @@ public class AuctionSearch implements IAuctionSearch {
                 Transformer transformer = TransformerFactory.newInstance().newTransformer();
                 DOMSource source = new DOMSource(doc);
                 StringWriter writer = new StringWriter();
-                StreamResult res = new StreamResult(writer);
-                transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-                transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
-                transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-                transformer.transform(source, res);
+                StreamResult result = new StreamResult(writer);
+                transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+                    .setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+                    .setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes")
+                    .transform(source, result);
                 xml = writer.toString();
             }
 
