@@ -353,7 +353,6 @@ public class AuctionSearch implements IAuctionSearch {
                 xml = finalEscape(xml);
             }
 
-            // Write the XML
             rs.close();
             retrieveItem.close();
 
