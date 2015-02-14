@@ -350,7 +350,7 @@ public class AuctionSearch implements IAuctionSearch {
                 transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
                 transformer.transform(source, result);
                 xml = writer.toString();
-                xml = xml.finalEscape();
+                xml = finalEscape(xml);
             }
 
             // Write the XML
@@ -380,9 +380,9 @@ public class AuctionSearch implements IAuctionSearch {
 	}
 
     private String escapeSpecial(String unescapedString) {
-        return unescapedString.replaceAll("\"", "&quot;")
+        return unescapedString.replaceAll("&", "&amp;")
+            .replaceAll("\"", "&quot;")
             .replaceAll("\'", "&apos;")
-            .replaceAll("&", "&amp;")
             .replaceAll("<", "&lt;")
             .replaceAll(">", "&lt;");
     }
