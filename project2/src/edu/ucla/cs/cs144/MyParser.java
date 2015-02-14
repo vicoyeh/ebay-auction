@@ -407,6 +407,10 @@ class MyParser {
                 String location_id;
                 if (locationMap.containsKey(locName)) {
                     location_id = locationMap.get(locName).id;
+                    if (locationMap.get(locName).lng.equals("\\N")) {
+                        locationMap.get(locName).lng = lng;
+                        locationMap.get(locName).lat = lat;
+                    }
                 } else {
                     locationIndex = hash(locName);
                     String locIDString = Integer.toString(locationIndex);
@@ -449,9 +453,11 @@ class MyParser {
 
             String iLocation_id;
             if (locationMap.containsKey(iLocName)) {
-                
                 iLocation_id = locationMap.get(iLocName).id;
-
+                if (locationMap.get(iLocName).lng.equals("\\N")) {
+                    locationMap.get(iLocName).lng = iLng;
+                    locationMap.get(iLocName).lat = iLat;
+                }
             } else {
                 locationIndex = hash(iLocName);
                 String locIDString = Integer.toString(locationIndex);
