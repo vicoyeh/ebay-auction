@@ -358,7 +358,12 @@ public class AuctionSearch implements IAuctionSearch {
 
 		} catch (SQLException ex) {
 	        System.out.println(ex);
-	    } 
+	    } catch (ParserConfigurationException ex) {
+	        System.out.println(ex);
+	    } catch (TransformerConfigurationException ex) {
+	        System.out.println(ex);
+	    } catch (TransformerException ex) {
+	        System.out.println(ex);
         
         // close database connection
 		try {
