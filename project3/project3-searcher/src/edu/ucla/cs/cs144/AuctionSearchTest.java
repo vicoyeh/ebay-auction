@@ -12,9 +12,9 @@ public class AuctionSearchTest {
 	{
 		AuctionSearch as = new AuctionSearch();
 
-		// String message = "Test message";
-		// String reply = as.echo(message);
-		// System.out.println("Reply: " + reply);
+		String message = "Test message";
+		String reply = as.echo(message);
+		System.out.println("Reply: " + reply);
 		
 		// String query = "superman";
 		// SearchResult[] basicResults = as.basicSearch(query, 0, 20);

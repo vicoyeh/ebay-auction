@@ -136,7 +136,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 	        ResultSet rs = prepareRetrieveLoc.executeQuery();
 	       	int iid;
-	       	String id,category;
+	       	String id;
 	       	
 	       	ArrayList<String> idList = new ArrayList<String>();
 	        while (rs.next()) {
@@ -146,7 +146,6 @@ public class AuctionSearch implements IAuctionSearch {
 	        }
 	        SearchResult[] resultList = basicSearch(query, 0, idList.size());
 	        ArrayList<SearchResult> resultArray = new ArrayList<SearchResult>();
-
 	        for (int i=0;i<resultList.length;i++) {
 	        	if (idList.contains(resultList[i].getItemId())) {
 	        		resultArray.add(resultList[i]);
