@@ -260,7 +260,7 @@ public class AuctionSearch implements IAuctionSearch {
                 PreparedStatement retrieveBids = conn.prepareStatement(
                     "SELECT * FROM Bids INNER JOIN Users ON bidder_id = Users.id INNER JOIN Location ON Users.location_id = Location.id WHERE item_id = ?"
                 );
-                retrieve.setString(1, itemId);
+                retrieveBids.setString(1, itemId);
                 ResultSet bidsRs = retrieveBids.executeQuery();
                 Integer numBids = 0;
                 while (bidsRs.next()) {
@@ -269,7 +269,7 @@ public class AuctionSearch implements IAuctionSearch {
                     // bidder
                     Element bidder = doc.createElement("Bidder");
                     bidder.setAttribute("UserID", escapeSpecial(bidsRs.getString("bidder_id")));
-                    bidder.setAttribute("Rating", bidresult.getString("bidder_rating"));
+                    bidder.setAttribute("Rating", bidsRs.getString("bidder_rating"));
                     String loc = bidsRs.getString("location");
                     if (loc != null) {
                         Element location = doc.createElement("Location");
@@ -278,20 +278,20 @@ public class AuctionSearch implements IAuctionSearch {
                     }
                     String country = bidsRs.getString("country");
                     if (country != null) {
-                        Element country = doc.createElement("Country");
-                        country.appendChild(doc.createTextNode(escapeSpecial(country)));
-                        bidder.appendChild(country);
+                        Element countryEl = doc.createElement("Country");
+                        countryEl.appendChild(doc.createTextNode(escapeSpecial(country)));
+                        bidder.appendChild(countryEl);
                     }
                     bid.appendChild(bidder);
 
                     // time
                     Element time = doc.createElement("Time");
-                    time.appendChild(doc.createTextNode(convertDate(bidresult.getString("time"), "yyyy-MM-dd HH:mm:ss", "MMM-dd-yy HH:mm:ss")));
+                    time.appendChild(doc.createTextNode(convertDate(bidsRs.getString("time"), "yyyy-MM-dd HH:mm:ss", "MMM-dd-yy HH:mm:ss")));
                     bid.appendChild(time);
 
                     // amount
                     Element amount = doc.createElement("Amount"); 
-                    amount.appendChild(doc.createTextNode(bidresult.getString("amount")));
+                    amount.appendChild(doc.createTextNode(bidsRs.getString("amount")));
                     bid.appendChild(amount);
 
                     bids.appendChild(bid);
@@ -351,7 +351,7 @@ public class AuctionSearch implements IAuctionSearch {
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
             transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
             transformer.transform(source, res);
-            xmlstore = writer.toString();
+            xml = writer.toString();
 
             rs.close();
             retrieveItem.close();
@@ -388,7 +388,7 @@ public class AuctionSearch implements IAuctionSearch {
         try {
             Date d = sdf.parse(date);
             sdf.applyPattern(converted_format);
-            out = sdf.format(d);
+            formatted_date = sdf.format(d);
         } catch (Exception e) {
             System.out.println("Error formatting date");
         }
