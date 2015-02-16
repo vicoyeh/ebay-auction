@@ -1,6 +1,13 @@
-This example contains a simple utility class to simplify opening database
-connections in Java applications, such as the one you will write to build
-your Lucene index. 
+***********************************************************
+TEAM: based_vic
+**********************************************************
+ 
+TEAM MEMBERS:
+Calvin Chan
+Kuan-Hsuan Yeh
 
-To build and run the sample code, use the "run" ant target inside
-the directory with build.xml by typing "ant run".
+**********************************************************
+
+
+##Indexer
+We decided to create Lucene indexes on item_id, item_name, and content (item_id+item_name+category+description). Since the goal is to efficiently perform keyword search on item name, category, and description, building Lucene indexes on these attributes will faciliate the search performace. However, only the item id and item name will be stored.

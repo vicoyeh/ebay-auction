@@ -74,7 +74,7 @@ public class AuctionSearch implements IAuctionSearch {
 
 
 		try {
-	        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(new File("/var/lib/lucene/index1/"))));
+	        searcher = new IndexSearcher(DirectoryReader.open(FSDirectory.open(new File("/var/lib/lucene/"))));
 	        //default search field is name
 	        parser = new QueryParser("content", new StandardAnalyzer());
 
