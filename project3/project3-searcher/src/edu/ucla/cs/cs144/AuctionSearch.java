@@ -65,31 +65,9 @@ public class AuctionSearch implements IAuctionSearch {
          *
          */
 
-	static private Connection conn = null;
-    static private IndexSearcher searcher = null;
-    static private QueryParser parser = null;
-
-	
-    AuctionSearch() {
-        // create a connection to the database to retrieve Items from MySQL
-		try {
-		    conn = DbManager.getConnection(true);
-		} catch (SQLException ex) {
-		    System.out.println(ex);
-		}
-
-    }
-
-    public void closeDB() throws IOException {
-		// close the database connection
-		if (conn!=null) {
-			try {
-			    conn.close();
-			} catch (SQLException ex) {
-			    System.out.println(ex);
-			}
-		}
-    }
+	private Connection conn = null;
+    private IndexSearcher searcher = null;
+    private QueryParser parser = null;
 
 	public SearchResult[] basicSearch(String query, int numResultsToSkip, 
 			int numResultsToReturn) {
@@ -374,6 +352,7 @@ public class AuctionSearch implements IAuctionSearch {
 		return xml;
 	}
 	
+    
 	public String echo(String message) {
 		return message;
 	}
