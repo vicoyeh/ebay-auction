@@ -11,19 +11,14 @@
 
 <body>
 
+<h1>Keyword Search</h1>
 <form action="./search" method="GET">
 	<div>
 		<label>Keywords</label>
 		<input name="q" type="text">
 	</div>
-	<div>
-		<label>Number of results to skip</label>
-		<input name="numResultsToSkip" type="text">
-	</div>
-	<div>
-		<label>Number of results to return</label>
-		<input name="numResultsToReturn" type="text">
-	</div>
+	<input name="numResultsToSkip" value="0" type="hidden">
+	<input name="numResultsToReturn" value="10" type="hidden">
 	<button type="submit">Search</button>
 </form>
 

@@ -6,19 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="keywords" content="ebay, bidding, data, search">
 	<!--META END-->
-	<title>Search - Ebay</title>
+	<title>Get Item - Ebay</title>
 </head>
 
 <body>
 
-<h1>Keyword Search</h1>
-<form action="./search" method="GET">
+<h1>Get Item</h1>
+<form action="./item" method="GET">
 	<div>
-		<label>Keywords</label>
-		<input name="q" type="text">
+		<label>Item ID</label>
+		<input name="id" type="text">
 	</div>
-	<input name="numResultsToSkip" value="0" type="hidden">
-	<input name="numResultsToReturn" value="10" type="hidden">
 	<button type="submit">Search</button>
 </form>
 

@@ -11,10 +11,18 @@
 </head>
 
 <body>
-
+<form action="./search" method="GET">
+	<div>
+		<label>Keywords</label>
+		<input name="q" type="text">
+	</div>
+	<input name="numResultsToSkip" value="0" type="hidden">
+	<input name="numResultsToReturn" value="10" type="hidden">
+	<button type="submit">Search</button>
+</form>
 	
 <%
-	SearchResult[] results = request.getAttribute("results");
+	SearchResult[] results = (SearchResult[])request.getAttribute("results");
 %>
 	
 	
@@ -22,7 +30,7 @@
 	<h1>Results</h1>
 	<ul>
 		<% for (SearchResult item: results) { %>
-			<li>ID:<%= item.getItemId() %> Name:<%= item.getName()%></li>	
+			<a href="/eBay/item?id=<%=item.getItemId()%>"><li>ID:<%= item.getItemId() %> Name:<%= item.getName()%></li></a>	
 		<% } %>
 	</ul>
 </div>
