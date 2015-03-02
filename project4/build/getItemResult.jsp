@@ -10,9 +10,49 @@
 	<meta name="keywords" content="ebay, bidding, data, search">
 	<!--META END-->
 	<title>Item - Ebay</title>
+
+	<script type="text/javascript"  src="http://maps.google.com/maps/api/js?sensor=false"> 
+	</script> 
+	<script type="text/javascript"> 
+	  function initialize() { 
+	  	geocoder=new google.maps.Geocoder();
+
+	    var latlng = new google.maps.LatLng(34.063509,-118.44541); 
+	    var myOptions = { 
+	      zoom: 14, // default is 8  
+	      center: latlng, 
+	      mapTypeId: google.maps.MapTypeId.ROADMAP 
+	    }; 
+	    var map = new google.maps.Map(document.getElementById("map_canvas"), 
+	        myOptions); 
+	    geocoder.geocode({'address': '<%=request.getAttribute("Location")%>, <%=request.getAttribute("Country") %>'}, function(results, status) {
+	    	if (status == google.maps.GeocoderStatus.OK) {
+	    		map.setCenter(results[0].geometry.location);
+                var marker = new google.maps.Marker({
+                    map: map,
+                    position: results[0].geometry.location
+                });	    		
+	    	} else {
+			    geocoder.geocode({'address':"USA"}, function(results, status) {
+			        if (status == google.maps.GeocoderStatus.OK) {
+			          map.setCenter(results[0].geometry.location);
+			          var marker = new google.maps.Marker({
+			            map: map,
+			            zoom: 5,
+			            position: results[0].geometry.location
+			          });
+			        }
+			    });
+	    	}
+	    });
+
+	  } 
+
+	</script>
+
 </head>
 
-<body>
+<body  onload="initialize()">
 <form action="./item" method="GET">
 	<div>
 		<label>Item ID</label>
@@ -68,6 +108,8 @@ ArrayList<Bid> Bids = (ArrayList<Bid>) request.getAttribute("Bids");
 <p>Latitude: <%=request.getAttribute("Latitude")%>, Longtitude: <%=request.getAttribute("Longitude")%></p>
 <p>Country: <%=request.getAttribute("Country")%></p>
 </div>
+
+<div id="map_canvas" style="width:100%; height:350px"></div> 
 
 <h3>Seller Info</h3>
 <div>
