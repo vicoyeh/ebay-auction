@@ -17,7 +17,7 @@
 		<input name="q" type="text">
 	</div>
 	<input name="numResultsToSkip" value="0" type="hidden">
-	<input name="numResultsToReturn" value="10" type="hidden">
+	<input name="numResultsToReturn" value="20" type="hidden">
 	<button type="submit">Search</button>
 </form>
 	
@@ -33,6 +33,26 @@
 			<a href="/eBay/item?id=<%=item.getItemId()%>"><li>ID:<%= item.getItemId() %> Name:<%= item.getName()%></li></a>	
 		<% } %>
 	</ul>
+</div>
+
+<div>
+<%
+	String q=(String)request.getAttribute("q");
+	int numResultsToSkip=Integer.parseInt((String)request.getAttribute("numResultsToSkip"));
+	int numResultsToReturn=Integer.parseInt((String)request.getAttribute("numResultsToReturn"));
+
+	int skip=numResultsToSkip-20;
+	if (numResultsToSkip-20<0)
+		skip=0;
+
+
+ if (numResultsToSkip>0) { %>
+	<a href="/eBay/search?q=<%= q %>&numResultsToSkip=<%= skip %>&numResultsToReturn=20">Previous</a> 
+<% } %>
+
+<% if (results.length==numResultsToReturn) { %>
+	<a href="/eBay/search?q=<%= q %>&numResultsToSkip=<%= numResultsToSkip+20 %>&numResultsToReturn=20">Next</a>
+<% } %>
 </div>
 
 </body>

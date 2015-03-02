@@ -116,30 +116,46 @@ public class ItemServlet extends HttpServlet implements Servlet {
 		    String First_Bid=getElementTextByTagNameNR(root,"First_Bid");
 		    int Number_of_Bids=Integer.parseInt(getElementTextByTagNameNR(root,"Number_of_Bids"));
 		    //bids
-		    Element[] bids=getElementsByTagNameNR(root,"Bids");
+		    Element bidsTag=getElementByTagNameNR(root,"Bids");
+		    Element[] bids=getElementsByTagNameNR(bidsTag,"Bid");
+
+
 		    ArrayList<Bid> Bids=new ArrayList<Bid>();
 		    for (int i=0;i<Number_of_Bids;i++) {
 		    	Element bidder=getElementByTagNameNR(bids[i],"Bidder");
 		    	String uid=bidder.getAttribute("UserID");
 		    	String rating=bidder.getAttribute("Rating");
+
+		    	//location
 		    	Element locationTag=getElementByTagNameNR(bidder,"Location");
-		    	String location=getElementText(locationTag);
-		    	String latitude=locationTag.getAttribute("Latitute");
-		    	String longitude=locationTag.getAttribute("Longitude");
+		    	String location="N/A";
+		    	String latitude="N/A";
+		    	String longitude="N/A";
+		    	if (locationTag!=null) {
+		    		location=getElementText(locationTag);
+		    		if (locationTag.hasAttribute("Latitute"))
+		    			latitude=locationTag.getAttribute("Latitute");
+		    		if (locationTag.hasAttribute("Longitude"))
+		    			longitude=locationTag.getAttribute("Longitude");
+		    	}
 		    	String country=getElementTextByTagNameNR(bidder,"Country");
+		    	if (country.isEmpty()) 
+		    		country="N/A";
+
 		    	String time=getElementTextByTagNameNR(bids[i],"Time");
 		    	String amount=getElementTextByTagNameNR(bids[i],"Amount");
 		    	Bid newBid=new Bid(uid,rating,location,latitude,longitude,country,time,amount);
 		    	Bids.add(newBid);
 		    }
+		    Collections.sort(Bids);
 
 		    Element locationTag=getElementByTagNameNR(root,"Location");
 		    String Location=getElementText(locationTag);
-		    String Latitude="";
-		    String Longitude="";
-		    if (!locationTag.getAttribute("Latitude").isEmpty())
+		    String Latitude="N/A";
+		    String Longitude="N/A";
+		    if (locationTag.hasAttribute("Latitude"))
 		    	Latitude=locationTag.getAttribute("Latitude");
-		    if (!locationTag.getAttribute("Longitude").isEmpty())
+		    if (locationTag.hasAttribute("Longitude"))
 		    	Longitude=locationTag.getAttribute("Longitude");
 
 		    String Country=getElementTextByTagNameNR(root,"Country");

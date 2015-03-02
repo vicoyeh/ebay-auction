@@ -1,6 +1,11 @@
 package edu.ucla.cs.cs144;
 
-    public class Bid {
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.Date;
+
+    public class Bid implements Comparable<Bid> {
         public String BidderID;
         public String BidderRating;
         public String Location;
@@ -20,5 +25,24 @@ package edu.ucla.cs.cs144;
 	        Time=time;
 	       	Amount=amount;          
         }
+
+          @Override
+          public int compareTo(Bid o) {
+        
+            SimpleDateFormat format =
+                new SimpleDateFormat("MMM-dd-yy HH:mm:ss");
+
+            try {
+                Date d1 = format.parse(Time);
+                Date d2 = format.parse(o.Time);
+                return d2.compareTo(d1);
+            }
+            catch(ParseException pe) {
+                pe.printStackTrace();
+            }
+
+
+            return o.Time.compareTo(Time);
+          }
     }
 

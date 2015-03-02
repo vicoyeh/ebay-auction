@@ -54,7 +54,8 @@ ArrayList<Bid> Bids = (ArrayList<Bid>) request.getAttribute("Bids");
 <% for (Bid item: Bids) { %>
 		<li>
 			<p><%=item.BidderID%> (Rating: <%=item.BidderRating%>)</p>
-			<p><%=item.Location%> (<%=item.Latitude%>,<%=item.Longitude%>)</p>
+			<p>Location: <%=item.Location%> (Lat: <%=item.Latitude%>, Lng: <%=item.Longitude%>)</p>
+			<p>Country: <%=item.Country%></p>
 			<p>$<%=item.Amount%> at <%=item.Time%></p>
 		</li>
 <% } %>
@@ -64,7 +65,7 @@ ArrayList<Bid> Bids = (ArrayList<Bid>) request.getAttribute("Bids");
 <h3>Location</h3>
 <div>
 <p>Location: <%=request.getAttribute("Location")%></p>
-<p>Latitude: <%=request.getAttribute("Latitude")%> Longtitude: <%=request.getAttribute("Longitude")%></p>
+<p>Latitude: <%=request.getAttribute("Latitude")%>, Longtitude: <%=request.getAttribute("Longitude")%></p>
 <p>Country: <%=request.getAttribute("Country")%></p>
 </div>
 
