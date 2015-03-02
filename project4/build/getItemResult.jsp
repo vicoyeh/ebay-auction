@@ -11,8 +11,7 @@
 	<!--META END-->
 	<title>Item - Ebay</title>
 
-	<script type="text/javascript"  src="http://maps.google.com/maps/api/js?sensor=false"> 
-	</script> 
+	<script type="text/javascript"  src="http://maps.google.com/maps/api/js?sensor=false"></script> 
 	<script type="text/javascript"> 
 	  function initialize() { 
 	  	geocoder=new google.maps.Geocoder();

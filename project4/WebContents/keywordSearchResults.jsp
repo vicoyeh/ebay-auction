@@ -8,13 +8,24 @@
 	<meta name="keywords" content="ebay, bidding, data, search">
 	<!--META END-->
 	<title>Search Results - Ebay</title>
+
+        <script type="text/javascript" src="autosuggest.js"></script>
+        <script type="text/javascript" src="suggestions.js"></script>
+        <link rel="stylesheet" type="text/css" href="autosuggest.css" /> 
+	<script type="text/javascript">
+        window.onload = function () {
+           var oTextbox = new AutoSuggestControl(document.getElementById("txtBox"), new StateSuggestions()); 
+        }
+    </script>
+
+
 </head>
 
 <body>
 <form action="./search" method="GET">
 	<div>
 		<label>Keywords</label>
-		<input name="q" type="text">
+		<input id="txtBox" name="q" type="text">
 	</div>
 	<input name="numResultsToSkip" value="0" type="hidden">
 	<input name="numResultsToReturn" value="20" type="hidden">
