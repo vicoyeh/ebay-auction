@@ -11,9 +11,9 @@
 </head>
 <body>
 
-<p>ID: [TODO]</p> 
-<p>Name: [TODO]</p>
-<p>Buy Price: [TODO]</p>
+<p>ID: <%= request.getAttribute("ItemID")%></p> 
+<p>Name: <%= request.getAttribute("Name")%></p>
+<p>Buy Price: <%= request.getAttribute("Buy_Price")%></p>
 <form action="" method="POST">
 	<label>Credit card number</label>
 	<input name="card" type="text">

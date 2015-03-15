@@ -11,7 +11,7 @@
 	<!--META END-->
 	<title>Item - Ebay</title>
 
-	<script type="text/javascript"  src="http://maps.google.com/maps/api/js?sensor=false"></script> 
+	<script type="text/javascript"  src="///maps.google.com/maps/api/js?sensor=false"></script> 
 	<script type="text/javascript"> 
 	  function initialize() { 
 	  	geocoder=new google.maps.Geocoder();
@@ -120,6 +120,10 @@ ArrayList<Bid> Bids = (ArrayList<Bid>) request.getAttribute("Bids");
 <p>Rating: <%=request.getAttribute("Rating")%></p>
 </div>
 
+<form action="/item" method="POST">
+	<input hidden="hidden" value="<%=request.getAttribute("ItemID")%>" name="id">
+	<input type="submit" value="Pay Now">
+</form>
 
 </body>
 </html>
