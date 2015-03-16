@@ -9,19 +9,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 	<meta name="keywords" content="ebay, bidding, data, search">
 	<!--META END-->
-	<title>Pay Now - Ebay</title>
+	<title>Confirmation - Ebay</title>
 
 </head>
 <body>
-<h1>Pay Now</h1>
+<h1>Your transaction is complete!</h1>
 <p>ID: <%= request.getAttribute("ItemID")%></p> 
 <p>Name: <%= request.getAttribute("Name")%></p>
 <p>Buy Price: <%= request.getAttribute("Buy_Price")%></p>
-<form action="https://<%=request.getServerName()%>:8443<%=request.getContextPath()%>/transaction" method="POST">
-	<label>Credit card number</label>
-	<input name="card" type="text">
-	<button type="submit">Submit</button>
-</form>
+<p>Credit card number: <%= request.getAttribute("card")%></p>
+<p>Time: <%= request.getAttribute("time")%></p>
 
 </body>
 </html>

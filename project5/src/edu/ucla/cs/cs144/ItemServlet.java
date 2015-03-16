@@ -6,6 +6,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.*;
 import java.text.*;
@@ -88,9 +89,10 @@ public class ItemServlet extends HttpServlet implements Servlet {
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
 	{
 		HttpSession session = request.getSession(true);
-		Item cur_item = session.getAttribute("cur_item");
+		Item cur_item = (Item)session.getAttribute("cur_item");
 	    if (cur_item == null) {
-			//TODO: throw exception or redirect or something...
+            String url = "http://"+request.getServerName()+":1448"+request.getContextPath()+"/keywordSearch.html";
+            response.sendRedirect(url);
 		}	
 		request.setAttribute("Name", cur_item.Name);
 		request.setAttribute("ItemID",cur_item.Id);
@@ -179,9 +181,9 @@ public class ItemServlet extends HttpServlet implements Servlet {
 		    String SellerRating=sellerTag.getAttribute("Rating");
 		    String Description=getElementTextByTagNameNR(root,"Description");
 
-		HttpSession session = request.getSession(true);
-		Item cur_item = new Item(Name,ItemID,Buy_Price);
-		session.setAttribute("cur_item",cur_item);
+			HttpSession session = request.getSession(true);
+			Item cur_item = new Item(Name,ItemID,Buy_Price);
+			session.setAttribute("cur_item",cur_item);
 
 		    //redirect
     		request.setAttribute("Name", Name);
@@ -202,7 +204,9 @@ public class ItemServlet extends HttpServlet implements Servlet {
 			request.setAttribute("Rating", SellerRating);
 			request.setAttribute("Description", Description);
 			
+
 			request.getRequestDispatcher("/getItemResult.jsp").forward(request,response);
+
 		    
 
 

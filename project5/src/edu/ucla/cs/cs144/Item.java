@@ -7,9 +7,9 @@ import java.text.ParseException;
         public String Id;
         public String Buy_Price;
 
-        Bid(String name, String id, String buy_price) {
-        	Name=Name;
-		Id=id;
-		Buy_Price=buy_price
+        Item(String name, String id, String buy_price) {
+        	Name=name;
+		    Id=id;
+		    Buy_Price=buy_price;
         }
     }

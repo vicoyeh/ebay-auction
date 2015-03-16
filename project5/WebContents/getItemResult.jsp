@@ -80,7 +80,10 @@
 <p>Currently: <%=request.getAttribute("Currently")%></p>
 <p>Buy Price: <%=request.getAttribute("Buy_Price")%>
 <% if (!((String)request.getAttribute("Buy_Price")).equals("N/A")) { %>
-<a href="/eBay/creditCard.html"> Pay Now!</a>
+<form action="./item" method="POST">
+	<input hidden="hidden" value="<%=request.getAttribute("ItemID")%>" name="id">
+	<input type="submit" value="Pay Now">
+</form>
 <% } %>
 </p>
 <p>First Bid: <%=request.getAttribute("First_Bid")%></p>
@@ -120,10 +123,6 @@ ArrayList<Bid> Bids = (ArrayList<Bid>) request.getAttribute("Bids");
 <p>Rating: <%=request.getAttribute("Rating")%></p>
 </div>
 
-<form action="/item" method="POST">
-	<input hidden="hidden" value="<%=request.getAttribute("ItemID")%>" name="id">
-	<input type="submit" value="Pay Now">
-</form>
 
 </body>
 </html>
